@@ -1,4 +1,4 @@
-const Cliente = require("../src/models/Cliente");
+const Cliente = require("../src/model/Cliente");
 
 const clientes = [
   new Cliente(1, "Ana Paula Souza", "(11) 91234-5678", "Rua das Flores, 123 - São Paulo/SP"),
