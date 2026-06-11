@@ -2,7 +2,9 @@ const prisma = require("../config/prisma");
 
 const ListarClientes = async (req, res) => {
     try{
-        const resultado = await prisma.cliente.findMany(); 
+        const resultado = await prisma.cliente.findMany({
+            where: { ativo: true }
+        }); 
         return res.status(200).json({
             sucesso: true, 
             total: resultado.length,
@@ -86,9 +88,11 @@ const adicionarCliente = async(req, res) => {
 const atualizarCliente = async (req, res) => {
     try{
       const { id } = req.params;
-      const { nome, telfone, endereco } = req.body
-      
-      
+      const{nome, telefone, endereco} = req.body;
+     
+      const cliente = await prisma.cliente.findUnique({
+        where: { id: parseInt(id) }
+      });
 
       if(!cliente){
         return res.status(484).json({
@@ -96,10 +100,11 @@ const atualizarCliente = async (req, res) => {
             mensagem: `Cliente de id ${id} nao encontrado`
         });
       }else{
-        cliente.nome = nome;
-        cliente.telefone = telefone;
-        cliente.endereco = endereco;
-
+        await prisma.cliente.update({
+            where: { id: parseInt(id)},
+            data: { nome, telefone, endereco},
+        })
+        
         return res.status(200).json({
             sucesso: true,
             mensagem: "Cliente atualizado com sucesso"
@@ -120,15 +125,20 @@ const atualizarCliente = async (req, res) => {
 const deletarCliente = async(req, res) => {
     try{
       const { id } = req.params;
-      const index = clientes.findIndex((c) => c.id == id);
+      const cliente = await prisma.cliente.findUnique({
+        where: { id: parseInt(id) }
+      });
       
-      if(index === -1){
+      if(!cliente){
          return res.status(404).json({
          sucesso: false,
          mensagem: `Clientes de ${id} nao encontrado`
         })
       }else{
-        clientes.splice(index, 1);
+        await prisma.cliente.update({
+            where: { id: parseInt(id) },
+            data: { ativo: false },
+        });
         return res.status(200).json({
             sucesso: true, 
             mensagem: `Cliente com ${id} removido com sucesso`

@@ -12,7 +12,7 @@ model Client {
     nome String 
     telefone String?
     endereco String?
-
+    ativo Boolean @default(true)
 
     @@map("tbCliente")
 }
